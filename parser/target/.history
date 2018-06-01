@@ -1,0 +1,10 @@
+run
+update
+run
+update
+ last *:update
++
+update
+run
+eclipse
+run

@@ -1,0 +1,18 @@
+Folders:
+
+backup: nothing useful. Old version of codes;
+
+Client: show how to invoke a microservice; [HTML file to invoke MS]
+
+executor: runs on the gateway, execute a certain execution graph of a service suite, and output the result. 
+
+parser: parse the input MOLE file. [Old Version of Grammar]
+
+microservices: the executable files of microservice, which is the basic blocks of service suite. 
+
+gateway: files to be deployed on the gateway. 
+	-- device.php script for device selection; 
+	-- dmg: service suite execution: executor.jar is the output of the executor; 
+									 executeServiceSuite.php 
+									 
+testdata: test data for ICDCS submission. 

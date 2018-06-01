@@ -1,0 +1,34 @@
+Service temperature{    
+	MS:sensor_temperature{
+		device: select("TemperatureSensor = TRUE").sort("Battery").loc()
+		on.Execution.FAILURE:  invoke location_temperature
+		on.Execution.SUCCESS:  return temperature as temp; Service.exit
+	}
+	
+	MS:location_temperature{
+		set: $location=  _
+		on.Execution.FAILURE: Service.exit
+		on.Execution.SUCCESS: return temperature as temp; Service.exit
+	}
+	
+	MS:getGPS{
+		device: select("GPSSensor = TRUE")
+		on.Execution.SUCCESS: output GPS as location;
+	}
+	
+	MS:getCellIDLocation{
+		device: select("CellNetwork = TRUE")
+		on.Execution.SUCCESS: output Location as location;
+	}
+	
+	MS:getIP{
+		device: select("Network = TRUE")
+		on.Execution.SUCCESS: output ip;
+	}
+	
+	MS:IP_Location{
+		device: select("Network = TRUE")
+		set: $ip= _
+		on.Execution.SUCCESS: output Location as location;
+	}
+}

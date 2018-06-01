@@ -1,0 +1,64 @@
+package RQL.dsl
+import scala.util.parsing.combinator._
+import scala.util.parsing.combinator.syntactical._
+
+object MobileServiceDSL extends StandardTokenParsers{
+  lexical.reserved += ("ExecutionParameter", "Service", "MicroService", "Global", "input", "device", "select", "sort", "set", "on", "Execution", "SUCCESS", "AS", "result", "FAILURE", "null", "return", "exit")
+  
+  lexical.delimiters += ("{","}",".","->",":","$",";","(",")",">","<","==",">=","<=",",","|","=")
+  
+  lazy val MobileService = service_id ~ service_description
+  
+  lazy val service_id = "Service"~ ident
+  lazy val service_description = "{"~>service_params ~ MicroServices<~"}"
+  
+  lazy val inputKey = ident;
+  lazy val inputValue = ident|numericLit 
+  lazy val service_params = "Global"~"input"~":"~>rep1sep("$"~ident,",")<~";"
+  
+  lazy val MicroServices = rep(MicroService)
+  
+  lazy val MicroService = MS_SeqNum ~ MS_id ~ MS_details
+  lazy val MS_id = ident
+  lazy val MS_SeqNum = "MicroService"~ numericLit <~":"
+  
+  lazy val MS_details = "{"~ rep(MS_specifics) ~ "}"
+  //lazy val MS_specifics = ("device" ~ ":" ~ deviceRes | "set" ~ ":" ~ setRes | onCondition ~ ":" ~ onRes) ~ ";"
+
+  lazy val MS_specifics = "device" ~ ":" ~ deviceRes ~ ";"
+
+    //device selection rules
+  lazy val deviceRes = select_rule ~ "." ~ sort_rule
+  lazy val select_rule = "select"~"("~>stringLit <~ ")"
+  lazy val sort_rule = "sort"~"("~>stringLit <~ ")"
+  
+  /*
+  // set execution parameters and inputs
+  lazy val setRes = executionParameter|inputParameter
+  lazy val inputParameter = input ~ "AS" ~ taskInputkey
+  lazy val input = numericLit|ident|"$"~ident
+  lazy val taskInputkey = ident;
+  lazy val executionParameter = "ExecutionParameter" ~ "." ~ inputKey ~ "=" ~ inputValue
+ 
+  //on execution result conditions
+  lazy val onCondition = "on" ~ "." ~ condition
+  lazy val condition = execution_status|result_status
+  lazy val execution_status = "Execution" ~ "." ~ "FAILURE"|"Execution" ~ "." ~ "SUCCESS"
+  lazy val result_status = "("~ rep1sep(result_conditions,"|") ~")"
+  lazy val result_conditions = resultKey ~ operators ~ constraint
+  lazy val resultKey = "result" ~ "." ~ ident
+  lazy val operators = ">"|"<"|"=="|">="|"<="
+  lazy val constraint = ident|numericLit;
+  
+  // on execution result reactions
+  lazy val onRes = rep1sep(onResponses,"|")
+  lazy val onResponses =  serviceExit | outputToReturn | outputToTask
+  lazy val serviceExit = "Service" ~ "." ~ "exit" 
+  lazy val outputToReturn = resultKey ~ "AS" ~ returnKey
+  lazy val outputToTask = inputToTask ~ "->" ~ "task" ~ numericLit
+  lazy val inputToTask = ident|numericLit|resultKey|"null"
+  lazy val returnKey = "return" ~ "." ~ ident; 
+ 
+ */
+  
+}

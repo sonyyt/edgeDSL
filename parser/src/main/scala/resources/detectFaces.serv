@@ -1,0 +1,31 @@
+Service detectFaces{  
+	Global input: $privacy_concern;  
+	MS:take_picture{
+		device: select("Camera = TRUE").sort("Battery")
+		on.Execution.FAILURE:  Service.exit
+		on.Execution.SUCCESS:  output image_url; output image_size; invoke findOffloadTarget
+	}
+	
+	MS:findOffloadTarget{
+		set: $image_size = _
+		set: $image_url = _
+		set: $privacy_concern = _
+		on.Execution.FAILURE: Service.exit
+		on.result.remote == 1: output image_url as image; invoke cloud_face_detection
+		on.result.remote == 0: output image_url as image; invoke local_face_detection
+	}
+	
+	MS:cloud_face_detection{
+		device: select("Cloud = TRUE")
+		set: $image = _
+		on.Execution.SUCCESS: return faces as detectionResult;Service.exit
+		on.Execution.FAILURE: Service.exit
+	}
+	
+	MS:local_face_detection{
+		device: select("Local = TRUE")
+		set: $image = _
+		on.Execution.SUCCESS: return faces as detectionResult;Service.exit
+		on.Execution.FAILURE: Service.exit
+	}
+}

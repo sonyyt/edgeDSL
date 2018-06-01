@@ -1,0 +1,17 @@
+Service nearby_temperature{
+	Global input:
+		$GPS_coordinator;
+    
+	MicroService 1:sensor_temperature{
+		device: select("TemperatureSensor = TRUE" ).sort("distance.to($GPS_coordinator) ASC,1");
+		on.Execution.FAILURE: input GPS_coordinator as gps -> task 2;
+		on.Execution.SUCCESS:  return temperature | return status AS s  | Service.exit;
+	}
+	MicroService 2:internet_temperature{
+		device: select("Internet_ACCESS = TRUE").sort("Internet_SPEED DESC,1");
+		set:$GPS_coordinator=Given;
+		set:$Max_Retry = 3;
+		on.Execution.FAILURE: Service.exit;
+		on.Execution.SUCCESS: result.temperature AS return.temperature ; Service.exit;
+	}
+}
